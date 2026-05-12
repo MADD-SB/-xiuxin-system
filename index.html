@@ -5,43 +5,1657 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#080a09" />
     <title>修心系统</title>
-    <script>
-      window.tailwind = window.tailwind || {};
-      window.tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: [
-                "Inter",
-                "ui-sans-serif",
-                "system-ui",
-                "-apple-system",
-                "BlinkMacSystemFont",
-                "Segoe UI",
-                "Microsoft YaHei",
-                "PingFang SC",
-                "sans-serif",
-              ],
-            },
-          },
-        },
-      };
-    </script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="./src/styles.css" />
-    <script type="importmap">
-      {
-        "imports": {
-          "react": "https://esm.sh/react@18.3.1",
-          "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
-          "htm": "https://esm.sh/htm@3.1.1",
-          "lucide-react": "https://esm.sh/lucide-react@0.468.0?external=react"
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #080a09;
+        --panel: #101411;
+        --panel-2: #141914;
+        --line: rgba(255, 255, 255, 0.1);
+        --muted: #8f968d;
+        --text: #f3f4ef;
+        --soft: #c8cec4;
+        --green: #6ee7b7;
+        --green-2: #145c3e;
+        --gold: #f5c86a;
+        --red: #fb7185;
+        --blue: #7dd3fc;
+        --shadow: 0 22px 60px rgba(0, 0, 0, 0.28);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          "Microsoft YaHei",
+          "PingFang SC",
+          sans-serif;
+      }
+
+      button,
+      input,
+      textarea,
+      select {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      input,
+      textarea,
+      select {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.28);
+        color: var(--text);
+        outline: none;
+      }
+
+      input,
+      select {
+        min-height: 42px;
+        padding: 0 12px;
+      }
+
+      textarea {
+        min-height: 92px;
+        resize: vertical;
+        padding: 12px;
+      }
+
+      input:focus,
+      textarea:focus,
+      select:focus {
+        border-color: rgba(110, 231, 183, 0.65);
+      }
+
+      input[type="checkbox"] {
+        width: 16px;
+        min-height: 16px;
+        accent-color: var(--green);
+      }
+
+      input[type="range"] {
+        padding: 0;
+        accent-color: var(--green);
+      }
+
+      ::selection {
+        background: rgba(245, 200, 106, 0.35);
+      }
+
+      ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: rgba(110, 231, 183, 0.28);
+        border: 2px solid rgba(0, 0, 0, 0.45);
+        border-radius: 999px;
+      }
+
+      .shell {
+        min-height: 100vh;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 280px);
+      }
+
+      .layout {
+        display: flex;
+        width: 100%;
+        max-width: 1440px;
+        min-height: 100vh;
+        margin: 0 auto;
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 0;
+        width: 284px;
+        height: 100vh;
+        flex: 0 0 284px;
+        border-right: 1px solid var(--line);
+        background: rgba(0, 0, 0, 0.25);
+        padding: 24px 20px;
+      }
+
+      .brand {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .mark {
+        display: grid;
+        width: 44px;
+        height: 44px;
+        place-items: center;
+        border: 1px solid rgba(110, 231, 183, 0.32);
+        border-radius: 8px;
+        background: rgba(16, 185, 129, 0.12);
+        color: var(--green);
+        font-weight: 800;
+      }
+
+      .brand-title {
+        font-size: 18px;
+        font-weight: 800;
+      }
+
+      .brand-sub {
+        margin-top: 2px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .side-score {
+        margin-top: 20px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.035);
+        padding: 16px;
+      }
+
+      .nav {
+        display: grid;
+        gap: 8px;
+        margin-top: 28px;
+      }
+
+      .nav-btn,
+      .mobile-nav button {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--muted);
+        padding: 12px;
+        text-align: left;
+      }
+
+      .nav-btn.active,
+      .mobile-nav button.active {
+        border-color: rgba(110, 231, 183, 0.35);
+        background: rgba(16, 185, 129, 0.15);
+        color: #e9fff7;
+      }
+
+      .nav-btn:hover,
+      .mobile-nav button:hover {
+        border-color: var(--line);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+      }
+
+      .content {
+        min-width: 0;
+        flex: 1;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid var(--line);
+        background: rgba(8, 10, 9, 0.92);
+        backdrop-filter: blur(16px);
+        padding: 14px 32px;
+      }
+
+      .top-main {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .kicker {
+        color: rgba(110, 231, 183, 0.75);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        margin-top: 4px;
+        font-size: 28px;
+        line-height: 1.15;
+      }
+
+      .top-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .mobile-nav {
+        display: none;
+        gap: 8px;
+        margin-top: 14px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+
+      .mobile-nav button {
+        flex: 0 0 auto;
+        padding: 10px 12px;
+      }
+
+      main {
+        padding: 24px 32px 40px;
+      }
+
+      .grid {
+        display: grid;
+        gap: 16px;
+      }
+
+      .grid-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .grid-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .grid-4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .split {
+        grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+      }
+
+      .split-even {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .stack {
+        display: grid;
+        gap: 16px;
+      }
+
+      .section {
+        margin-top: 24px;
+      }
+
+      .card,
+      .stat,
+      .notice {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(16, 20, 17, 0.88);
+        box-shadow: var(--shadow);
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+      .card-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+
+      .card-title {
+        margin-top: 4px;
+        font-size: 17px;
+        font-weight: 800;
+      }
+
+      .stat {
+        padding: 16px;
+        min-height: 126px;
+      }
+
+      .stat-label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .stat-value {
+        margin-top: 14px;
+        font-size: 34px;
+        font-weight: 900;
+        line-height: 1;
+      }
+
+      .stat-sub {
+        margin-top: 8px;
+        color: var(--soft);
+        font-size: 14px;
+      }
+
+      .tone-red {
+        border-color: rgba(251, 113, 133, 0.28);
+        background: rgba(127, 29, 29, 0.18);
+      }
+
+      .tone-gold {
+        border-color: rgba(245, 200, 106, 0.28);
+        background: rgba(113, 63, 18, 0.18);
+      }
+
+      .tone-green {
+        border-color: rgba(110, 231, 183, 0.28);
+        background: rgba(20, 83, 45, 0.16);
+      }
+
+      .tone-blue {
+        border-color: rgba(125, 211, 252, 0.25);
+        background: rgba(8, 47, 73, 0.18);
+      }
+
+      .notice {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 16px;
+        padding: 14px 16px;
+        font-size: 14px;
+        box-shadow: none;
+      }
+
+      .notice.warn {
+        border-color: rgba(245, 200, 106, 0.32);
+        background: rgba(113, 63, 18, 0.2);
+        color: #fdecc8;
+      }
+
+      .notice.danger {
+        border-color: rgba(251, 113, 133, 0.32);
+        background: rgba(127, 29, 29, 0.2);
+        color: #ffe4e6;
+      }
+
+      .notice.success {
+        border-color: rgba(110, 231, 183, 0.32);
+        background: rgba(20, 83, 45, 0.2);
+        color: #d9fff0;
+      }
+
+      .bar {
+        width: 100%;
+        height: 8px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.38);
+      }
+
+      .bar > span {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: var(--green);
+      }
+
+      .bar.gold > span {
+        background: var(--gold);
+      }
+
+      .score-box,
+      .info-box,
+      .field-box,
+      .history-item {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.2);
+        padding: 14px;
+      }
+
+      .field {
+        display: grid;
+        gap: 8px;
+      }
+
+      .field > span,
+      .field-label {
+        color: var(--soft);
+        font-size: 14px;
+      }
+
+      .btn,
+      .icon-btn,
+      .chip {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--soft);
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 38px;
+        padding: 0 12px;
+        font-weight: 700;
+      }
+
+      .btn.primary {
+        border-color: rgba(110, 231, 183, 0.4);
+        background: rgba(16, 185, 129, 0.15);
+        color: #dbfff2;
+      }
+
+      .btn.gold {
+        border-color: rgba(245, 200, 106, 0.4);
+        background: rgba(245, 200, 106, 0.14);
+        color: #ffefc7;
+      }
+
+      .btn.danger {
+        border-color: rgba(251, 113, 133, 0.42);
+        background: rgba(251, 113, 133, 0.14);
+        color: #ffe4e6;
+      }
+
+      .btn:hover,
+      .icon-btn:hover,
+      .chip:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text);
+      }
+
+      .icon-btn {
+        display: inline-grid;
+        width: 38px;
+        height: 38px;
+        place-items: center;
+      }
+
+      .chip-wrap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .chip {
+        min-height: 36px;
+        padding: 0 12px;
+      }
+
+      .chip.active {
+        border-color: rgba(110, 231, 183, 0.45);
+        background: rgba(16, 185, 129, 0.15);
+        color: #dfffee;
+      }
+
+      .task-row {
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .task-row label,
+      .checkline {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        color: var(--soft);
+        font-size: 14px;
+      }
+
+      .checkline {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.2);
+        padding: 12px;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      .small {
+        font-size: 12px;
+      }
+
+      .lead {
+        font-size: 24px;
+        font-weight: 900;
+        line-height: 1.28;
+      }
+
+      .rows {
+        display: grid;
+        gap: 12px;
+      }
+
+      .item-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: flex-start;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .toast {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        z-index: 30;
+        border: 1px solid rgba(110, 231, 183, 0.35);
+        border-radius: 8px;
+        background: #103226;
+        color: #dcfff1;
+        padding: 12px 14px;
+        box-shadow: var(--shadow);
+        font-size: 14px;
+      }
+
+      .data-panel {
+        position: absolute;
+        top: 54px;
+        right: 0;
+        z-index: 20;
+        width: min(360px, calc(100vw - 32px));
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        padding: 12px;
+        box-shadow: var(--shadow);
+      }
+
+      .chart {
+        width: 100%;
+        height: 180px;
+      }
+
+      .empty {
+        border: 1px dashed var(--line);
+        border-radius: 8px;
+        padding: 28px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .table-card {
+        display: grid;
+        gap: 12px;
+      }
+
+      @media (max-width: 1100px) {
+        .grid-4,
+        .grid-3,
+        .split,
+        .split-even {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
         }
       }
-    </script>
+
+      @media (max-width: 860px) {
+        .layout {
+          display: block;
+        }
+
+        .sidebar {
+          display: none;
+        }
+
+        .topbar {
+          padding: 14px 16px;
+        }
+
+        .mobile-nav {
+          display: flex;
+        }
+
+        main {
+          padding: 24px 16px 36px;
+        }
+
+        .grid-4,
+        .grid-3,
+        .grid-2,
+        .split,
+        .split-even {
+          grid-template-columns: 1fr;
+        }
+
+        .top-actions .level-pill {
+          display: none;
+        }
+
+        h1 {
+          font-size: 24px;
+        }
+
+        .lead {
+          font-size: 22px;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .task-row {
+          grid-template-columns: 1fr;
+        }
+
+        .stat-value {
+          font-size: 32px;
+        }
+
+        .card-head,
+        .item-head {
+          display: grid;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="./src/main.js"></script>
+    <div id="app" class="shell"></div>
+    <script>
+      const STORAGE_KEY = "xiuxin-system-state-v2-single-file";
+      const LEGACY_KEY = "xiuxin-system-state-v1";
+
+      const navItems = [
+        ["today", "◎", "今日面板"],
+        ["review", "◉", "情绪复盘"],
+        ["desire", "♨", "欲望控制"],
+        ["reaction", "◇", "高级反应库"],
+        ["rules", "⚖", "规则惩罚"],
+        ["weekly", "⌁", "周复盘曲线"],
+      ];
+
+      const scoreItems = [
+        ["emotion", "情绪稳定", 25],
+        ["focus", "专注执行", 25],
+        ["desire", "欲望控制", 25],
+        ["output", "输出影响", 25],
+      ];
+
+      const todayLevels = [
+        [0, 40, "心乱如麻", "red"],
+        [41, 60, "勉强守住", "gold"],
+        [61, 80, "基本稳定", "green"],
+        [81, 90, "心性坚硬", "green"],
+        [91, 100, "主宰节奏", "green"],
+      ];
+
+      const pointLevels = [
+        ["Lv1", "心浮气躁", 0],
+        ["Lv2", "开始觉察", 100],
+        ["Lv3", "能守小戒", 250],
+        ["Lv4", "稳定执行", 450],
+        ["Lv5", "心性坚硬", 750],
+        ["Lv6", "主宰节奏", 1100],
+        ["Lv7", "影响他人", 1600],
+      ];
+
+      const scoreReminders = {
+        emotion: "今天不要急着证明自己，先稳住。",
+        focus: "你不是想太多，你是做太少。",
+        desire: "谁拿走你的注意力，谁就拿走你的主动权。",
+        output: "没有输出，就没有影响力。",
+      };
+
+      const systemQuotes = [
+        "谁拿走你的注意力，谁就拿走你的主动权。",
+        "你不是没有情绪，你是不能被情绪指挥。",
+        "真正的强者不是没有欲望，而是不被欲望牵着走。",
+        "没有输出，就没有影响力。",
+        "今天守不住小节，明天就守不住人生。",
+        "不要急着证明自己，先把事情做成。",
+        "女人可以喜欢，但不能放在人生主线前面。",
+        "情绪上头时，先闭嘴，先行动。",
+        "复盘不是骂自己，是夺回控制权。",
+        "你要做的是稳定输出，不是情绪表演。",
+      ];
+
+      const interferenceOptions = ["女人", "面子", "懒惰", "焦虑", "金钱", "比较", "短视频", "游戏", "睡眠不足", "家庭关系", "其他"];
+      const bodyReactionOptions = ["心跳加快", "胸口闷", "想刷手机", "想找人聊天", "想证明自己", "睡不着", "注意力分散"];
+      const desireOptions = ["想被认可", "想被喜欢", "想赢", "怕失败", "怕被抛弃", "想证明自己", "想获得陪伴", "想逃避现实", "想获得刺激", "自定义"];
+      const lowReactionOptions = ["秒回消息", "反复看手机", "情绪化发言", "熬夜", "逃避训练", "逃避学习", "幻想过多", "过度解释", "讨好别人", "冲动消费", "自定义"];
+      const highReactionOptions = ["延迟回复", "先完成训练", "先刷题", "先睡觉", "手机放远", "出去走路", "做20个俯卧撑", "直接表达边界", "不解释，用结果回应", "自定义"];
+      const weeklyControlOptions = ["女人", "面子", "懒惰", "焦虑", "金钱", "比较", "欲望", "手机"];
+      const weeklyOutputChecks = [
+        ["training", "训练是否完成"],
+        ["learning", "学习是否推进"],
+        ["money", "钱是否增加"],
+        ["content", "内容是否发布"],
+        ["expression", "表达是否练习"],
+      ];
+
+      const defaultDesires = [
+        ["desire-opposite-approval", "异性认可", "秒回、偷看朋友圈、反复等消息，把对方反应当成当天情绪开关。", "影响睡眠和训练，降低自尊，被别人牵着走。", "核心任务完成前不主动暧昧聊天；情绪上头时延迟20分钟回复。"],
+        ["desire-face", "面子", "想证明自己、过度解释、被一句评价牵动。", "失去节奏，做决定变形，把注意力交给旁观者。", "被质疑时先沉默，24小时内用行动和结果回应。"],
+        ["desire-short-video", "短视频", "刷短视频停不下来，训练和学习前先找刺激。", "切碎专注力，拖延核心任务，睡前兴奋。", "刷短视频限制15分钟；睡前30分钟手机放远。"],
+        ["desire-lazy", "懒惰", "推迟训练、拖着不开始、用准备替代行动。", "执行力钝化，计划失真，自我评价下降。", "任何任务先做10分钟，再决定是否调整。"],
+      ].map(([id, name, behavior, risk, rule]) => ({ id, name, behavior, risk, rule }));
+
+      const defaultAdvancedReactions = [
+        ["reaction-slow-reply", "女生回复慢", "反复看手机、猜测、焦虑、追问", "退回自己节奏，先训练、学习或做正事", "聊天、暧昧、关系拉扯"],
+        ["reaction-look-down", "别人看不起我", "急着解释、急着证明、情绪化反驳", "先闭嘴，用结果回应", "评价、比较、竞争"],
+        ["reaction-training-fail", "训练失败", "自我否定、摆烂", "记录原因，下次调整计划", "健身、学习、执行计划"],
+        ["reaction-wrong-questions", "学习错题多", "烦躁、逃避", "整理错题，提炼口诀", "刷题、复习、考试准备"],
+        ["reaction-night-chat", "睡前想聊天", "聊到上头，影响睡眠", "发一句“我先休息，明天聊”，然后关机睡觉", "睡前、关系刺激、情绪空窗"],
+      ].map(([id, trigger, low, high, scene]) => ({ id, trigger, low, high, scene, mastered: false }));
+
+      const defaultRules = [
+        ["rule-task-before-women", "任务优先于女人", "当天训练、学习、输出任务没有完成前，不主动开启暧昧聊天。", "想主动聊天、想找情绪陪伴、想证明吸引力时", "第二天加做30分钟学习复盘。", "当天修心积分+10。"],
+        ["rule-night-cut-stimulus", "睡前断刺激", "睡前30分钟不刷短视频、不暧昧聊天、不看刺激内容。", "准备睡觉前、疲惫时、情绪空虚时", "第二天早上写200字复盘。", "连续7天守住，获得一次自由娱乐时间。"],
+        ["rule-no-decision-when-hot", "上头不决策", "情绪强度超过7分时，不表白、不争吵、不做重大决定、不发长篇解释。", "情绪强度超过7分，想立刻说清楚或立刻做决定时", "做50个俯卧撑并写出触发点。", "记录一次“心性胜利”。"],
+      ].map(([id, name, content, trigger, punishment, reward]) => ({ id, name, content, trigger, punishment, reward, status: "启用" }));
+
+      const blankScores = () => ({ emotion: 0, focus: 0, desire: 0, output: 0 });
+      const clone = (value) => JSON.parse(JSON.stringify(value));
+      const todayKey = () => formatDate(new Date());
+      const uid = (prefix) => `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+      const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch]);
+      const clamp = (value, fallback = "未填写") => String(value || "").trim() || fallback;
+
+      function formatDate(date) {
+        const d = date instanceof Date ? date : new Date(date);
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, "0");
+        const day = String(d.getDate()).padStart(2, "0");
+        return `${y}-${m}-${day}`;
+      }
+
+      function addDays(dateKey, offset) {
+        const d = new Date(`${dateKey}T00:00:00`);
+        d.setDate(d.getDate() + offset);
+        return formatDate(d);
+      }
+
+      function createBlankPlan(date) {
+        return {
+          date,
+          tasks: {
+            training: { label: "今日训练任务", text: "", done: false },
+            learning: { label: "今日学习任务", text: "", done: false },
+            output: { label: "今日输出任务", text: "", done: false },
+          },
+          interference: [],
+          customInterference: "",
+        };
+      }
+
+      function createBlankReview(date) {
+        return {
+          id: "",
+          date,
+          event: "",
+          intensity: 5,
+          bodyReactions: [],
+          customBodyReaction: "",
+          realDesires: [],
+          customRealDesire: "",
+          lowReactions: [],
+          customLowReaction: "",
+          highReactions: [],
+          customHighReaction: "",
+          scores: blankScores(),
+          harshWords: "",
+          tomorrowRule: "",
+          highIntensityNoLowReaction: false,
+          outputCompleted: false,
+          lateNight: false,
+          emotionAffectedWork: false,
+          createdAt: "",
+          updatedAt: "",
+        };
+      }
+
+      const createBlankDesire = () => ({ id: "", name: "", behavior: "", risk: "", rule: "" });
+      const createBlankReaction = () => ({ id: "", trigger: "", low: "", high: "", scene: "", mastered: false });
+      const createBlankRule = () => ({ id: "", name: "", content: "", trigger: "", punishment: "", reward: "", status: "启用" });
+      const createBlankWeeklyReview = (weekDate) => ({
+        id: "",
+        weekDate,
+        controlledBy: [],
+        worst: { time: "", event: "", emotion: "", lowReaction: "", consequence: "", nextRule: "" },
+        restraint: { wanted: "", action: "", result: "" },
+        outputs: { training: false, learning: false, money: false, content: false, expression: false },
+        nextCoreRule: "",
+        weekLeak: "",
+        nextCultivation: "",
+        createdAt: "",
+        updatedAt: "",
+      });
+
+      function createDefaultState() {
+        const today = todayKey();
+        return {
+          version: 2,
+          dailyPlans: { [today]: createBlankPlan(today) },
+          dailyReviews: [],
+          desires: clone(defaultDesires),
+          desireLogs: {},
+          advancedReactions: clone(defaultAdvancedReactions),
+          rules: clone(defaultRules),
+          ruleLogs: {},
+          weeklyReviews: [],
+        };
+      }
+
+      function migrateState(raw) {
+        const defaults = createDefaultState();
+        const state = raw && typeof raw === "object" ? { ...defaults, ...raw } : defaults;
+        state.dailyPlans = state.dailyPlans || defaults.dailyPlans;
+        state.dailyReviews = Array.isArray(state.dailyReviews) ? state.dailyReviews : [];
+        state.desires = Array.isArray(state.desires) && state.desires.length ? state.desires : defaults.desires;
+        state.desireLogs = state.desireLogs || {};
+        state.advancedReactions = Array.isArray(state.advancedReactions) && state.advancedReactions.length ? state.advancedReactions : defaults.advancedReactions;
+        state.rules = Array.isArray(state.rules) && state.rules.length ? state.rules : defaults.rules;
+        state.ruleLogs = state.ruleLogs || {};
+        state.weeklyReviews = Array.isArray(state.weeklyReviews) ? state.weeklyReviews : [];
+        if (!state.dailyPlans[todayKey()]) state.dailyPlans[todayKey()] = createBlankPlan(todayKey());
+        return state;
+      }
+
+      function readState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_KEY);
+          return migrateState(raw ? JSON.parse(raw) : null);
+        } catch (error) {
+          console.warn("读取本地数据失败，已使用默认状态。", error);
+          return createDefaultState();
+        }
+      }
+
+      let state = readState();
+      let active = "today";
+      let showData = false;
+      let toastTimer = 0;
+      let notice = "";
+      let drafts = {
+        review: createBlankReview(todayKey()),
+        desire: createBlankDesire(),
+        reaction: createBlankReaction(),
+        rule: createBlankRule(),
+        weekly: createBlankWeeklyReview(todayKey()),
+        filterDate: todayKey(),
+        desireDate: todayKey(),
+        ruleDate: todayKey(),
+      };
+
+      function saveState() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      }
+
+      function flash(message) {
+        notice = message || "";
+        clearTimeout(toastTimer);
+        if (notice) toastTimer = setTimeout(() => { notice = ""; render(); }, 1600);
+      }
+
+      function commit(message) {
+        saveState();
+        flash(message);
+        render();
+      }
+
+      function sumScores(scores = {}) {
+        return scoreItems.reduce((sum, [key]) => sum + Number(scores[key] || 0), 0);
+      }
+
+      function getTodayLevel(total) {
+        return todayLevels.find(([min, max]) => total >= min && total <= max) || todayLevels[0];
+      }
+
+      function weakestScore(scores = {}) {
+        return [...scoreItems].sort((a, b) => Number(scores[a[0]] || 0) - Number(scores[b[0]] || 0))[0][0];
+      }
+
+      function completedBigTasks(plan) {
+        return !!plan && ["training", "learning", "output"].every((key) => plan.tasks?.[key]?.done);
+      }
+
+      function outputDone(plan, review) {
+        return !!(plan?.tasks?.output?.done || review?.outputCompleted);
+      }
+
+      function newestByDate(items) {
+        return [...(items || [])].sort((a, b) => String(b.date || b.weekDate).localeCompare(String(a.date || a.weekDate)));
+      }
+
+      function reviewStreak(base = todayKey()) {
+        const dates = new Set(state.dailyReviews.map((item) => item.date));
+        let count = 0;
+        let cursor = base;
+        while (dates.has(cursor)) {
+          count += 1;
+          cursor = addDays(cursor, -1);
+        }
+        return count;
+      }
+
+      function noReviewDays(base = todayKey()) {
+        if (!state.dailyReviews.length) return 9999;
+        const latest = newestByDate(state.dailyReviews)[0]?.date;
+        return Math.max(0, Math.round((new Date(`${base}T00:00:00`) - new Date(`${latest}T00:00:00`)) / 86400000));
+      }
+
+      function keptRuleStreak(base = todayKey()) {
+        let count = 0;
+        let cursor = base;
+        while (true) {
+          const logs = Object.values(state.ruleLogs[cursor] || {});
+          if (!logs.includes("kept") || logs.includes("broken")) break;
+          count += 1;
+          cursor = addDays(cursor, -1);
+        }
+        return count;
+      }
+
+      function keptDesireStreak(id, base = todayKey()) {
+        let count = 0;
+        let cursor = base;
+        while (state.desireLogs[cursor]?.[id] === "kept") {
+          count += 1;
+          cursor = addDays(cursor, -1);
+        }
+        return count;
+      }
+
+      function monthlyBreakCount(base = todayKey()) {
+        const month = base.slice(0, 7);
+        const countLogs = (logs) =>
+          Object.entries(logs || {}).reduce((sum, [date, dayLogs]) => {
+            if (date.slice(0, 7) !== month) return sum;
+            return sum + Object.values(dayLogs || {}).filter((value) => value === "broken").length;
+          }, 0);
+        return countLogs(state.desireLogs) + countLogs(state.ruleLogs);
+      }
+
+      function calculatePoints() {
+        const reviewsByDate = new Map(state.dailyReviews.map((item) => [item.date, item]));
+        const dates = new Set([...Object.keys(state.dailyPlans || {}), ...state.dailyReviews.map((item) => item.date)]);
+        let total = 0;
+        const detail = [];
+
+        state.dailyReviews.forEach((review) => {
+          total += 10;
+          detail.push({ date: review.date, label: "完成每日复盘", points: 10 });
+          if (Number(review.intensity) > 7 && review.highIntensityNoLowReaction) {
+            total += 30;
+            detail.push({ date: review.date, label: "高强度情绪下守住反应", points: 30 });
+          }
+          if (review.lateNight) {
+            total -= 15;
+            detail.push({ date: review.date, label: "熬夜一次", points: -15 });
+          }
+          if (review.emotionAffectedWork) {
+            total -= 15;
+            detail.push({ date: review.date, label: "情绪影响训练/学习", points: -15 });
+          }
+        });
+
+        dates.forEach((date) => {
+          const plan = state.dailyPlans[date];
+          const review = reviewsByDate.get(date);
+          if (completedBigTasks(plan)) {
+            total += 20;
+            detail.push({ date, label: "完成今日三件大事", points: 20 });
+          }
+          if (outputDone(plan, review)) {
+            total += 15;
+            detail.push({ date, label: "发布内容/完成输出", points: 15 });
+          }
+        });
+
+        Object.entries(state.ruleLogs || {}).forEach(([date, logs]) => {
+          Object.values(logs || {}).forEach((value) => {
+            if (value === "kept") {
+              total += 10;
+              detail.push({ date, label: "守住一条规则", points: 10 });
+            }
+            if (value === "broken") {
+              total -= 20;
+              detail.push({ date, label: "破戒一次", points: -20 });
+            }
+          });
+        });
+
+        Object.entries(state.desireLogs || {}).forEach(([date, logs]) => {
+          Object.values(logs || {}).forEach((value) => {
+            if (value === "broken") {
+              total -= 20;
+              detail.push({ date, label: "欲望破戒一次", points: -20 });
+            }
+          });
+        });
+
+        total = Math.max(0, total);
+        const current = [...pointLevels].reverse().find((item) => total >= item[2]) || pointLevels[0];
+        const next = pointLevels.find((item) => item[2] > current[2]);
+        const progress = next ? Math.round(((total - current[2]) / (next[2] - current[2])) * 100) : 100;
+        return {
+          total,
+          current,
+          next,
+          progress: Math.max(0, Math.min(100, progress)),
+          recent: newestByDate(detail).slice(0, 8),
+          reviewStreak: reviewStreak(),
+          ruleStreak: keptRuleStreak(),
+          breakCount: monthlyBreakCount(),
+        };
+      }
+
+      function chartSeries(days = 14) {
+        const reviews = new Map(state.dailyReviews.map((item) => [item.date, item]));
+        const today = todayKey();
+        return Array.from({ length: days }, (_, index) => {
+          const date = addDays(today, index - days + 1);
+          const scores = reviews.get(date)?.scores || {};
+          return {
+            date,
+            total: sumScores(scores),
+            emotion: Number(scores.emotion || 0),
+            desire: Number(scores.desire || 0),
+          };
+        });
+      }
+
+      function setDeep(target, path, value) {
+        const parts = path.split(".");
+        let cursor = target;
+        parts.slice(0, -1).forEach((part) => (cursor = cursor[part]));
+        cursor[parts.at(-1)] = value;
+      }
+
+      function getDeep(target, path) {
+        return path.split(".").reduce((cursor, part) => cursor?.[part], target);
+      }
+
+      function toggleArrayItem(array, value) {
+        return array.includes(value) ? array.filter((item) => item !== value) : [...array, value];
+      }
+
+      function navHtml() {
+        return navItems.map(([id, icon, label]) => `
+          <button class="nav-btn ${active === id ? "active" : ""}" onclick="app.setActive('${id}')">
+            <span>${icon}</span><span>${label}</span>
+          </button>`).join("");
+      }
+
+      function mobileNavHtml() {
+        return navItems.map(([id, icon, label]) => `
+          <button class="${active === id ? "active" : ""}" onclick="app.setActive('${id}')">
+            <span>${icon}</span><span>${label}</span>
+          </button>`).join("");
+      }
+
+      function bar(value, tone = "") {
+        return `<div class="bar ${tone}"><span style="width:${Math.max(0, Math.min(100, value))}%"></span></div>`;
+      }
+
+      function stat(label, value, sub, tone = "") {
+        return `<div class="stat ${tone ? `tone-${tone}` : ""}">
+          <div class="stat-label"><span>${esc(label)}</span><span>⌁</span></div>
+          <div class="stat-value">${esc(value)}</div>
+          <div class="stat-sub">${esc(sub || "")}</div>
+        </div>`;
+      }
+
+      function card(title, kicker, body, action = "") {
+        return `<section class="card">
+          <div class="card-head">
+            <div>${kicker ? `<div class="kicker">${esc(kicker)}</div>` : ""}<h2 class="card-title">${esc(title)}</h2></div>
+            ${action}
+          </div>
+          ${body}
+        </section>`;
+      }
+
+      function field(label, inner) {
+        return `<label class="field"><span>${esc(label)}</span>${inner}</label>`;
+      }
+
+      function textInput(value, handler, placeholder = "", type = "text") {
+        return `<input type="${type}" value="${esc(value)}" placeholder="${esc(placeholder)}" oninput="${handler}">`;
+      }
+
+      function textArea(value, handler, placeholder = "") {
+        return `<textarea placeholder="${esc(placeholder)}" oninput="${handler}">${esc(value)}</textarea>`;
+      }
+
+      function chips(options, selected, handler) {
+        return `<div class="chip-wrap">${options.map((option) => `
+          <button type="button" class="chip ${(selected || []).includes(option) ? "active" : ""}" onclick="${handler.replace("__VALUE__", esc(option))}">${esc(option)}</button>
+        `).join("")}</div>`;
+      }
+
+      function checkLine(checked, handler, label, sub = "") {
+        return `<label class="checkline">
+          <input type="checkbox" ${checked ? "checked" : ""} onchange="${handler}">
+          <span><strong>${esc(label)}</strong>${sub ? `<br><span class="muted small">${esc(sub)}</span>` : ""}</span>
+        </label>`;
+      }
+
+      function scoreSliders(scores, handlerPrefix) {
+        return `<div class="grid grid-2">${scoreItems.map(([key, label, max]) => {
+          const value = Number(scores[key] || 0);
+          return `<div class="score-box">
+            <div class="item-head"><span>${label}</span><strong>${value}/${max}</strong></div>
+            <input type="range" min="0" max="${max}" value="${value}" oninput="${handlerPrefix}('${key}', Number(this.value))">
+          </div>`;
+        }).join("")}</div>`;
+      }
+
+      function renderToday(points) {
+        const today = todayKey();
+        if (!state.dailyPlans[today]) state.dailyPlans[today] = createBlankPlan(today);
+        const plan = state.dailyPlans[today];
+        const review = state.dailyReviews.find((item) => item.date === today);
+        const scores = review?.scores || blankScores();
+        const total = review ? sumScores(scores) : 0;
+        const level = getTodayLevel(total);
+        const reminder = review ? scoreReminders[weakestScore(scores)] : "今日心未校准。先完成一次复盘，再判断今天的心性等级。";
+        const quote = systemQuotes[Number(today.replaceAll("-", "")) % systemQuotes.length];
+        const escaping = state.dailyReviews.length > 0 && noReviewDays() >= 3;
+
+        const scoreBody = `<div class="grid grid-2">${scoreItems.map(([key, label]) => {
+          const value = Number(scores[key] || 0);
+          return `<div class="score-box">
+            <div class="item-head"><span>${label}</span><strong>${value}/25</strong></div>
+            ${bar((value / 25) * 100)}
+          </div>`;
+        }).join("")}</div>
+        <div class="score-box tone-gold" style="margin-top:16px">
+          <div class="kicker">今日提醒语</div>
+          <p style="margin-top:8px;font-size:18px;font-weight:800;line-height:1.6">${esc(reminder)}</p>
+        </div>`;
+
+        const taskRows = Object.entries(plan.tasks).map(([key, task]) => `<div class="field-box task-row">
+          <label><input type="checkbox" ${task.done ? "checked" : ""} onchange="app.updatePlanTask('${key}','done',this.checked,true)"> ${esc(task.label)}</label>
+          ${textInput(task.text, `app.updatePlanTask('${key}','text',this.value,false)`, key === "training" ? "例：力量训练45分钟" : key === "learning" ? "例：刷题30道并整理错题" : "例：发布一条内容/完成作品")}
+        </div>`).join("");
+
+        const pointsBody = points.recent.length
+          ? `<div class="grid grid-2">${points.recent.map((item) => `<div class="info-box item-head">
+              <span>${esc(item.date)} · ${esc(item.label)}</span>
+              <strong style="color:${item.points >= 0 ? "var(--green)" : "var(--red)"}">${item.points > 0 ? "+" : ""}${item.points}</strong>
+            </div>`).join("")}</div>`
+          : `<div class="empty">暂无积分记录，完成复盘后这里会开始亮起来。</div>`;
+
+        return `<div class="stack">
+          <div class="grid grid-4">
+            ${stat("今日修心等级", level[2], review ? `${total}/100` : "未校准", level[3])}
+            ${stat("今日总分", total, "四项能力合计", "blue")}
+            ${stat("连续复盘", points.reviewStreak, escaping ? "正在逃避校准" : "天")}
+            ${stat("积分等级", points.current[0], points.next ? `距 ${points.next[0]} 还差 ${points.next[2] - points.total}` : "已到最高等级", "gold")}
+          </div>
+          <div class="grid split">
+            ${card("今日核心状态", "Daily State", scoreBody)}
+            ${card("系统文案", "Signal", `<div class="lead">${esc(quote)}</div><div style="margin-top:48px"><div class="item-head small muted"><span>${esc(points.current[1])}</span><span>${points.progress}%</span></div>${bar(points.progress, "gold")}</div>`)}
+          </div>
+          <div class="grid split-even">
+            ${card("今日三件大事", "Mission", `<div class="rows">${taskRows}</div><div class="info-box muted" style="margin-top:16px">${completedBigTasks(plan) ? "三件大事已完成，今日执行有根。" : "先把任务落地，别让情绪替你安排一天。"}</div>`, `<button class="btn primary" onclick="app.saveOnly()">保存</button>`)}
+            ${card("今日干扰源", "Interference", `${chips(interferenceOptions, plan.interference, "app.togglePlanInterference('__VALUE__')")}<div style="margin-top:16px">${field("自定义干扰源", textInput(plan.customInterference, "app.updatePlanCustom(this.value)", "写下今天最容易拿走你注意力的东西"))}</div><div class="actions" style="margin-top:16px"><button class="btn gold" onclick="app.setActive('review')">去做今晚复盘</button><button class="btn primary" onclick="app.setActive('rules')">打卡规则</button></div>`)}
+          </div>
+          ${card("近期积分记录", "Points", pointsBody)}
+        </div>`;
+      }
+
+      function selectionBlock(title, options, fieldName, customField) {
+        const form = drafts.review;
+        return `<div class="field-box">
+          <div class="field-label" style="margin-bottom:10px">${esc(title)}</div>
+          ${chips(options, form[fieldName], `app.toggleReviewArray('${fieldName}','__VALUE__')`)}
+          <div style="margin-top:12px">${textInput(form[customField], `app.updateDraft('review','${customField}',this.value,false)`, "自定义补充")}</div>
+        </div>`;
+      }
+
+      function renderReview() {
+        const form = drafts.review;
+        const reviews = newestByDate(state.dailyReviews);
+        const filtered = drafts.filterDate ? reviews.filter((item) => item.date === drafts.filterDate) : reviews;
+        const history = filtered.length
+          ? filtered.map((item) => `<div class="history-item">
+              <div class="item-head">
+                <div><div class="muted small">${esc(item.date)}</div><h3>${sumScores(item.scores)} 分</h3></div>
+                <div class="actions"><button class="icon-btn" onclick="app.editReview('${item.id}')">✎</button><button class="icon-btn" onclick="app.deleteReview('${item.id}')">×</button></div>
+              </div>
+              <p style="margin-top:12px;line-height:1.7">${esc(clamp(item.event, "未记录情绪事件"))}</p>
+              <p class="muted small" style="margin-top:10px">漏洞：${esc(clamp(item.harshWords))}</p>
+              <p class="muted small">明日规则：${esc(clamp(item.tomorrowRule))}</p>
+            </div>`).join("")
+          : `<div class="empty">没有找到这一天的复盘记录。</div>`;
+
+        const formBody = `
+          <div class="grid grid-2">
+            ${field("日期", textInput(form.date, "app.updateDraft('review','date',this.value,false)", "", "date"))}
+            ${field(`情绪强度：${form.intensity}/10`, `<input type="range" min="1" max="10" value="${form.intensity}" oninput="app.updateDraft('review','intensity',Number(this.value),true)">`)}
+          </div>
+          <div style="margin-top:16px">${field("今日最大情绪波动事件", textArea(form.event, "app.updateDraft('review','event',this.value,false)", "发生了什么？谁或什么刺激到了你？"))}</div>
+          <div class="rows" style="margin-top:16px">
+            ${selectionBlock("当时身体反应", bodyReactionOptions, "bodyReactions", "customBodyReaction")}
+            ${selectionBlock("我的真实欲望", desireOptions, "realDesires", "customRealDesire")}
+            ${selectionBlock("我的低级反应", lowReactionOptions, "lowReactions", "customLowReaction")}
+            ${selectionBlock("更高级的替代反应", highReactionOptions, "highReactions", "customHighReaction")}
+          </div>
+          <h3 style="margin-top:20px;margin-bottom:12px">今日四项评分</h3>
+          ${scoreSliders(form.scores, "app.updateReviewScore")}
+          <div class="grid grid-2" style="margin-top:16px">
+            ${field("今日一句狠话", textArea(form.harshWords, "app.updateDraft('review','harshWords',this.value,false)", "我今天最大的漏洞是：____"))}
+            ${field("明日一条规则", textArea(form.tomorrowRule, "app.updateDraft('review','tomorrowRule',this.value,false)", "明天我必须做到：____"))}
+          </div>
+          <div class="grid grid-2" style="margin-top:16px">
+            ${checkLine(form.highIntensityNoLowReaction, "app.updateDraft('review','highIntensityNoLowReaction',this.checked,true)", "情绪强度超过7但没有做低级反应", "+30 修心积分")}
+            ${checkLine(form.outputCompleted, "app.updateDraft('review','outputCompleted',this.checked,true)", "发布内容 / 完成输出", "+15 修心积分")}
+            ${checkLine(form.lateNight, "app.updateDraft('review','lateNight',this.checked,true)", "熬夜一次", "-15 修心积分")}
+            ${checkLine(form.emotionAffectedWork, "app.updateDraft('review','emotionAffectedWork',this.checked,true)", "因情绪影响训练/学习", "-15 修心积分")}
+          </div>`;
+
+        return `<div class="grid split">
+          ${card("每日情绪复盘", "Night Audit", formBody, `<div class="actions"><button class="icon-btn" onclick="app.resetReview()">↻</button><button class="btn primary" onclick="app.saveReview()">保存复盘</button></div>`)}
+          ${card("复盘历史", "History", `<div class="actions" style="margin-bottom:12px"><input type="date" value="${esc(drafts.filterDate)}" onchange="app.setFilterDate(this.value)"><button class="icon-btn" onclick="app.setFilterDate('')">×</button></div><div class="rows">${history}</div>`)}
+        </div>`;
+      }
+
+      function renderDesire() {
+        const f = drafts.desire;
+        const date = drafts.desireDate;
+        const form = `<div class="rows">
+          ${field("欲望名称", textInput(f.name, "app.updateDraft('desire','name',this.value,false)", "例：异性认可 / 面子 / 短视频"))}
+          ${field("典型表现", textArea(f.behavior, "app.updateDraft('desire','behavior',this.value,false)", "它通常怎么控制你？"))}
+          ${field("风险后果", textArea(f.risk, "app.updateDraft('desire','risk',this.value,false)", "如果失守，会损失什么？"))}
+          ${field("控制规则", textArea(f.rule, "app.updateDraft('desire','rule',this.value,false)", "把规则写具体，能执行，能判断。"))}
+          <div class="actions"><button class="btn gold" onclick="app.resetDesire()">新建</button></div>
+        </div>`;
+
+        const cards = state.desires.map((item) => {
+          const status = state.desireLogs[date]?.[item.id];
+          return `<div class="history-item">
+            <div class="item-head">
+              <div><h3>${esc(item.name)}</h3><div class="small" style="color:var(--green)">连续守住 ${keptDesireStreak(item.id)} 天</div></div>
+              <div class="actions"><button class="icon-btn" onclick="app.editDesire('${item.id}')">✎</button><button class="icon-btn" onclick="app.deleteDesire('${item.id}')">×</button></div>
+            </div>
+            <p style="margin-top:12px;line-height:1.7"><span class="muted">表现：</span>${esc(clamp(item.behavior))}</p>
+            <p style="line-height:1.7"><span class="muted">后果：</span>${esc(clamp(item.risk))}</p>
+            <p style="line-height:1.7"><span class="muted">规则：</span>${esc(clamp(item.rule))}</p>
+            <div class="actions" style="margin-top:14px">
+              <button class="btn ${status === "kept" ? "primary" : ""}" onclick="app.logDesire('${item.id}','kept')">守住了</button>
+              <button class="btn ${status === "broken" ? "danger" : ""}" onclick="app.logDesire('${item.id}','broken')">破戒了</button>
+              <button class="icon-btn" onclick="app.logDesire('${item.id}','')">×</button>
+            </div>
+          </div>`;
+        }).join("");
+
+        return `<div class="grid split">
+          ${card(f.id ? "编辑欲望" : "新增欲望", "Control Rule", form, `<button class="btn primary" onclick="app.saveDesire()">保存</button>`)}
+          ${card("欲望控制系统", "Oath Log", `<div style="margin-bottom:14px"><input type="date" value="${esc(date)}" onchange="app.setDesireDate(this.value)"></div><div class="grid grid-2">${cards || `<div class="empty">暂无欲望记录。</div>`}</div>`)}
+        </div>`;
+      }
+
+      function renderReaction() {
+        const f = drafts.reaction;
+        const form = `<div class="grid grid-3">
+          ${field("刺激情境", textInput(f.trigger, "app.updateDraft('reaction','trigger',this.value,false)"))}
+          ${field("低级反应", textInput(f.low, "app.updateDraft('reaction','low',this.value,false)"))}
+          ${field("高级反应", textInput(f.high, "app.updateDraft('reaction','high',this.value,false)"))}
+          ${field("适用场景", textInput(f.scene, "app.updateDraft('reaction','scene',this.value,false)"))}
+          ${checkLine(f.mastered, "app.updateDraft('reaction','mastered',this.checked,true)", "是否已掌握")}
+        </div>`;
+
+        const cards = state.advancedReactions.map((item) => `<div class="history-item">
+          <div class="item-head">
+            <div><div class="muted small">刺激情境</div><h3>${esc(item.trigger)}</h3></div>
+            <div class="actions"><button class="icon-btn" onclick="app.toggleReactionMastered('${item.id}')">${item.mastered ? "✓" : "○"}</button><button class="icon-btn" onclick="app.editReaction('${item.id}')">✎</button><button class="icon-btn" onclick="app.deleteReaction('${item.id}')">×</button></div>
+          </div>
+          <div class="grid grid-2" style="margin-top:14px">
+            <div class="info-box tone-red"><div class="muted small">低级反应</div><p style="margin-top:6px;line-height:1.7">${esc(item.low)}</p></div>
+            <div class="info-box tone-green"><div class="muted small">高级反应</div><p style="margin-top:6px;line-height:1.7">${esc(item.high)}</p></div>
+          </div>
+          <p class="muted small" style="margin-top:12px">适用场景：${esc(clamp(item.scene))}</p>
+        </div>`).join("");
+
+        return `<div class="stack">
+          ${card(f.id ? "编辑高级反应" : "新增高级反应", "Response Upgrade", form, `<div class="actions"><button class="icon-btn" onclick="app.resetReaction()">↻</button><button class="btn primary" onclick="app.saveReaction()">保存</button></div>`)}
+          <div class="grid grid-2">${cards}</div>
+        </div>`;
+      }
+
+      function renderRules(points) {
+        const f = drafts.rule;
+        const date = drafts.ruleDate;
+        const form = `<div class="rows">
+          ${field("规则名称", textInput(f.name, "app.updateDraft('rule','name',this.value,false)", "例：上头不决策"))}
+          ${field("规则内容", textArea(f.content, "app.updateDraft('rule','content',this.value,false)"))}
+          ${field("触发条件", textArea(f.trigger, "app.updateDraft('rule','trigger',this.value,false)"))}
+          <div class="grid grid-2">
+            ${field("违反后的惩罚", textArea(f.punishment, "app.updateDraft('rule','punishment',this.value,false)"))}
+            ${field("完成后的奖励", textArea(f.reward, "app.updateDraft('rule','reward',this.value,false)"))}
+          </div>
+          ${field("当前状态", `<select onchange="app.updateDraft('rule','status',this.value,false)"><option ${f.status === "启用" ? "selected" : ""}>启用</option><option ${f.status === "暂停" ? "selected" : ""}>暂停</option><option ${f.status === "已完成" ? "selected" : ""}>已完成</option></select>`)}
+          <div class="actions"><button class="btn gold" onclick="app.resetRule()">新建规则</button></div>
+        </div>`;
+
+        const cards = state.rules.map((rule) => {
+          const status = state.ruleLogs[date]?.[rule.id];
+          return `<div class="history-item">
+            <div class="item-head">
+              <div><h3>${esc(rule.name)} <span class="muted small"> ${esc(rule.status)}</span></h3><p style="margin-top:8px;line-height:1.7">${esc(rule.content)}</p></div>
+              <div class="actions"><button class="icon-btn" onclick="app.editRule('${rule.id}')">✎</button><button class="icon-btn" onclick="app.deleteRule('${rule.id}')">×</button></div>
+            </div>
+            <div class="grid grid-3" style="margin-top:14px">
+              <div class="info-box"><div class="muted small">触发</div><p style="margin-top:6px;line-height:1.7">${esc(clamp(rule.trigger))}</p></div>
+              <div class="info-box"><div class="muted small">惩罚</div><p style="margin-top:6px;line-height:1.7">${esc(clamp(rule.punishment))}</p></div>
+              <div class="info-box"><div class="muted small">奖励</div><p style="margin-top:6px;line-height:1.7">${esc(clamp(rule.reward))}</p></div>
+            </div>
+            <div class="actions" style="margin-top:14px">
+              <button class="btn ${status === "kept" ? "primary" : ""}" onclick="app.logRule('${rule.id}','kept')">守住了</button>
+              <button class="btn ${status === "broken" ? "danger" : ""}" onclick="app.logRule('${rule.id}','broken')">违反了</button>
+              <button class="icon-btn" onclick="app.logRule('${rule.id}','')">×</button>
+            </div>
+          </div>`;
+        }).join("");
+
+        return `<div class="grid split">
+          ${card(f.id ? "编辑规则" : "新增规则", "Boundary", form, `<button class="btn primary" onclick="app.saveRule()">保存</button>`)}
+          ${card("规则与惩罚系统", "Discipline", `<div class="item-head" style="margin-bottom:14px"><span class="muted">连续守住 ${points.ruleStreak} 天</span><input type="date" value="${esc(date)}" onchange="app.setRuleDate(this.value)"></div><div class="rows">${cards}</div>`)}
+        </div>`;
+      }
+
+      function miniChart(title, data, metric, max, color) {
+        const width = 360, height = 160, px = 24, top = 18, bottom = 126, usable = width - px * 2;
+        const points = data.map((item, index) => {
+          const x = px + (data.length === 1 ? 0 : (usable / (data.length - 1)) * index);
+          const y = bottom - (Number(item[metric] || 0) / max) * (bottom - top);
+          return `${x.toFixed(1)},${y.toFixed(1)}`;
+        }).join(" ");
+        const dots = data.map((item, index) => {
+          const x = px + (data.length === 1 ? 0 : (usable / (data.length - 1)) * index);
+          const y = bottom - (Number(item[metric] || 0) / max) * (bottom - top);
+          return `<circle cx="${x}" cy="${y}" r="3" fill="${color}"></circle>`;
+        }).join("");
+        return `<div class="info-box">
+          <div class="item-head"><h3>${esc(title)}</h3><strong>${Number(data.at(-1)?.[metric] || 0)}</strong></div>
+          <svg class="chart" viewBox="0 0 ${width} ${height}">
+            <line x1="24" y1="126" x2="336" y2="126" stroke="rgba(255,255,255,.12)"></line>
+            <line x1="24" y1="72" x2="336" y2="72" stroke="rgba(255,255,255,.07)"></line>
+            <line x1="24" y1="18" x2="336" y2="18" stroke="rgba(255,255,255,.07)"></line>
+            <polyline points="${points}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
+            ${dots}
+          </svg>
+          <div class="item-head muted small"><span>${esc(data[0]?.date.slice(5) || "")}</span><span>${esc(data.at(-1)?.date.slice(5) || "")}</span></div>
+        </div>`;
+      }
+
+      function renderWeekly(points) {
+        const f = drafts.weekly;
+        const data = chartSeries();
+        const form = `
+          <div class="grid grid-2">
+            ${field("周复盘日期", textInput(f.weekDate, "app.updateDraft('weekly','weekDate',this.value,false)", "", "date"))}
+            <div><div class="field-label" style="margin-bottom:8px">本周最容易被什么控制？</div>${chips(weeklyControlOptions, f.controlledBy, "app.toggleWeeklyControlled('__VALUE__')")}</div>
+          </div>
+          <div class="field-box" style="margin-top:16px">
+            <h3 style="margin-bottom:12px">本周最失控的一次</h3>
+            <div class="grid grid-2">
+              ${field("时间", textInput(f.worst.time, "app.updateDraft('weekly','worst.time',this.value,false)"))}
+              ${field("事件", textInput(f.worst.event, "app.updateDraft('weekly','worst.event',this.value,false)"))}
+              ${field("情绪", textInput(f.worst.emotion, "app.updateDraft('weekly','worst.emotion',this.value,false)"))}
+              ${field("低级反应", textInput(f.worst.lowReaction, "app.updateDraft('weekly','worst.lowReaction',this.value,false)"))}
+              ${field("后果", textArea(f.worst.consequence, "app.updateDraft('weekly','worst.consequence',this.value,false)"))}
+              ${field("下次规则", textArea(f.worst.nextRule, "app.updateDraft('weekly','worst.nextRule',this.value,false)"))}
+            </div>
+          </div>
+          <div class="field-box" style="margin-top:16px">
+            <h3 style="margin-bottom:12px">本周最强的一次克制</h3>
+            <div class="grid grid-3">
+              ${field("我想做什么", textArea(f.restraint.wanted, "app.updateDraft('weekly','restraint.wanted',this.value,false)"))}
+              ${field("我最后怎么克制", textArea(f.restraint.action, "app.updateDraft('weekly','restraint.action',this.value,false)"))}
+              ${field("克制后带来的结果", textArea(f.restraint.result, "app.updateDraft('weekly','restraint.result',this.value,false)"))}
+            </div>
+          </div>
+          <h3 style="margin-top:18px;margin-bottom:12px">本周是否有稳定输出</h3>
+          <div class="grid grid-2">${weeklyOutputChecks.map(([key, label]) => checkLine(f.outputs[key], `app.updateDraft('weekly','outputs.${key}',this.checked,true)`, label)).join("")}</div>
+          <div class="grid grid-3" style="margin-top:16px">
+            ${field("下周一条核心规则", textArea(f.nextCoreRule, "app.updateDraft('weekly','nextCoreRule',this.value,false)"))}
+            ${field("我这一周最大的漏洞是", textArea(f.weekLeak, "app.updateDraft('weekly','weekLeak',this.value,false)"))}
+            ${field("我下周最重要的修炼是", textArea(f.nextCultivation, "app.updateDraft('weekly','nextCultivation',this.value,false)"))}
+          </div>`;
+
+        const history = newestByDate(state.weeklyReviews).map((item) => `<div class="history-item">
+          <div class="item-head">
+            <div><div class="muted small">${esc(item.weekDate)}</div><h3>${esc(item.controlledBy?.join(" / ") || "未标记控制源")}</h3></div>
+            <div class="actions"><button class="icon-btn" onclick="app.editWeekly('${item.id}')">✎</button><button class="icon-btn" onclick="app.deleteWeekly('${item.id}')">×</button></div>
+          </div>
+          <p style="margin-top:12px;line-height:1.7">最大漏洞：${esc(clamp(item.weekLeak))}</p>
+          <p class="muted small">下周修炼：${esc(clamp(item.nextCultivation))}</p>
+        </div>`).join("") || `<div class="empty">还没有周复盘。</div>`;
+
+        return `<div class="stack">
+          <div class="grid grid-3">
+            ${stat("连续复盘天数", points.reviewStreak, "每日校准", "green")}
+            ${stat("连续守住规则天数", points.ruleStreak, "规则无破口", "gold")}
+            ${stat("本月破戒次数", points.breakCount, "欲望/规则失守", points.breakCount ? "red" : "")}
+          </div>
+          ${card("成长曲线", "Growth Curve", `<div class="grid grid-3">${miniChart("每日总分变化", data, "total", 100, "#f5c86a")}${miniChart("情绪稳定分变化", data, "emotion", 25, "#6ee7b7")}${miniChart("欲望控制分变化", data, "desire", 25, "#86efac")}</div>`)}
+          <div class="grid split">
+            ${card(f.id ? "编辑周复盘" : "本周复盘", "Weekly Audit", form, `<div class="actions"><button class="icon-btn" onclick="app.resetWeekly()">↻</button><button class="btn primary" onclick="app.saveWeekly()">保存</button></div>`)}
+            ${card("周复盘历史", "Archive", `<div class="rows">${history}</div>`)}
+          </div>
+        </div>`;
+      }
+
+      function dataToolsHtml() {
+        return `<div style="position:relative">
+          <button class="btn" onclick="app.toggleDataTools()">数据</button>
+          ${showData ? `<div class="data-panel">
+            <div class="actions"><button class="btn gold" onclick="app.exportData()">导出</button><button class="btn primary" onclick="app.importData()">导入</button></div>
+            <textarea id="import-json" style="margin-top:12px;min-height:120px" placeholder="粘贴备份 JSON"></textarea>
+          </div>` : ""}
+        </div>`;
+      }
+
+      function render() {
+        const points = calculatePoints();
+        const today = todayKey();
+        const todayReview = state.dailyReviews.find((item) => item.date === today);
+        const escaping = state.dailyReviews.length > 0 && noReviewDays() >= 3;
+        const title = navItems.find(([id]) => id === active)?.[2] || "今日面板";
+        const page =
+          active === "review" ? renderReview()
+          : active === "desire" ? renderDesire()
+          : active === "reaction" ? renderReaction()
+          : active === "rules" ? renderRules(points)
+          : active === "weekly" ? renderWeekly(points)
+          : renderToday(points);
+
+        document.getElementById("app").innerHTML = `
+          ${notice ? `<div class="toast">${esc(notice)}</div>` : ""}
+          <div class="layout">
+            <aside class="sidebar">
+              <div class="brand"><div class="mark">心</div><div><div class="brand-title">修心系统</div><div class="brand-sub">稳定自己，影响他人</div></div></div>
+              <div class="side-score">
+                <div class="item-head muted small"><span>修心积分</span><span>${esc(points.current[0])}</span></div>
+                <div class="stat-value" style="color:#fff2bd">${points.total}</div>
+                <div class="stat-sub">${esc(points.current[1])}</div>
+                ${bar(points.progress, "gold")}
+              </div>
+              <nav class="nav">${navHtml()}</nav>
+            </aside>
+            <div class="content">
+              <header class="topbar">
+                <div class="top-main">
+                  <div><div class="kicker">修心系统</div><h1>${esc(title)}</h1></div>
+                  <div class="top-actions">
+                    <div class="level-pill stat tone-gold" style="min-height:0;padding:9px 12px;text-align:right"><strong>${esc(points.current[0])} · ${esc(points.current[1])}</strong><br><span class="small">${points.total} 积分</span></div>
+                    ${dataToolsHtml()}
+                  </div>
+                </div>
+                <div class="mobile-nav">${mobileNavHtml()}</div>
+              </header>
+              <main>
+                ${!todayReview ? `<div class="notice warn"><span>△</span><span>今日心未校准。</span></div>` : ""}
+                ${escaping ? `<div class="notice danger"><span>△</span><span>你不是没时间，你是在逃避看见自己。</span></div>` : ""}
+                ${points.reviewStreak >= 7 ? `<div class="notice success"><span>✓</span><span>你开始拿回主动权。</span></div>` : ""}
+                ${page}
+              </main>
+            </div>
+          </div>`;
+      }
+
+      window.app = {
+        setActive(id) { active = id; showData = false; render(); },
+        toggleDataTools() { showData = !showData; render(); },
+        saveOnly() { commit("已保存"); },
+        updateDraft(name, path, value, shouldRender) { setDeep(drafts[name], path, value); if (shouldRender) render(); },
+        updateReviewScore(key, value) { drafts.review.scores[key] = value; render(); },
+        toggleReviewArray(field, value) { drafts.review[field] = toggleArrayItem(drafts.review[field] || [], value); render(); },
+        setFilterDate(value) { drafts.filterDate = value; render(); },
+        updatePlanTask(key, prop, value, shouldRender) {
+          const today = todayKey();
+          if (!state.dailyPlans[today]) state.dailyPlans[today] = createBlankPlan(today);
+          state.dailyPlans[today].tasks[key][prop] = value;
+          saveState();
+          if (shouldRender) render();
+        },
+        updatePlanCustom(value) {
+          const today = todayKey();
+          if (!state.dailyPlans[today]) state.dailyPlans[today] = createBlankPlan(today);
+          state.dailyPlans[today].customInterference = value;
+          saveState();
+        },
+        togglePlanInterference(value) {
+          const today = todayKey();
+          if (!state.dailyPlans[today]) state.dailyPlans[today] = createBlankPlan(today);
+          state.dailyPlans[today].interference = toggleArrayItem(state.dailyPlans[today].interference || [], value);
+          commit("干扰源已更新");
+        },
+        resetReview() { drafts.review = createBlankReview(todayKey()); render(); },
+        saveReview() {
+          const existing = state.dailyReviews.find((item) => item.id === drafts.review.id || item.date === drafts.review.date);
+          const item = { ...clone(drafts.review), id: existing?.id || drafts.review.id || uid("review"), createdAt: existing?.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() };
+          state.dailyReviews = [item, ...state.dailyReviews.filter((review) => review.id !== item.id && review.date !== item.date)];
+          drafts.review = clone(item);
+          drafts.filterDate = item.date;
+          commit("复盘已保存");
+        },
+        editReview(id) { const item = state.dailyReviews.find((review) => review.id === id); if (item) { drafts.review = clone(item); render(); } },
+        deleteReview(id) { state.dailyReviews = state.dailyReviews.filter((item) => item.id !== id); commit("复盘已删除"); },
+        resetDesire() { drafts.desire = createBlankDesire(); render(); },
+        saveDesire() {
+          if (!drafts.desire.name.trim()) return flash("请先填写欲望名称"), render();
+          const item = { ...clone(drafts.desire), id: drafts.desire.id || uid("desire") };
+          state.desires = state.desires.some((old) => old.id === item.id) ? state.desires.map((old) => old.id === item.id ? item : old) : [item, ...state.desires];
+          drafts.desire = createBlankDesire();
+          commit("欲望规则已保存");
+        },
+        editDesire(id) { const item = state.desires.find((old) => old.id === id); if (item) { drafts.desire = clone(item); render(); } },
+        deleteDesire(id) { state.desires = state.desires.filter((item) => item.id !== id); commit("欲望记录已删除"); },
+        setDesireDate(value) { drafts.desireDate = value; render(); },
+        logDesire(id, status) {
+          const date = drafts.desireDate;
+          state.desireLogs[date] = { ...(state.desireLogs[date] || {}) };
+          if (status) state.desireLogs[date][id] = status;
+          else delete state.desireLogs[date][id];
+          commit(status === "broken" ? "已记录破戒" : status === "kept" ? "已记录守住" : "打卡已清除");
+        },
+        resetReaction() { drafts.reaction = createBlankReaction(); render(); },
+        saveReaction() {
+          if (!drafts.reaction.trigger.trim()) return flash("请先填写刺激情境"), render();
+          const item = { ...clone(drafts.reaction), id: drafts.reaction.id || uid("reaction") };
+          state.advancedReactions = state.advancedReactions.some((old) => old.id === item.id) ? state.advancedReactions.map((old) => old.id === item.id ? item : old) : [item, ...state.advancedReactions];
+          drafts.reaction = createBlankReaction();
+          commit("高级反应已保存");
+        },
+        editReaction(id) { const item = state.advancedReactions.find((old) => old.id === id); if (item) { drafts.reaction = clone(item); render(); } },
+        deleteReaction(id) { state.advancedReactions = state.advancedReactions.filter((item) => item.id !== id); commit("反应记录已删除"); },
+        toggleReactionMastered(id) { state.advancedReactions = state.advancedReactions.map((item) => item.id === id ? { ...item, mastered: !item.mastered } : item); commit("掌握状态已更新"); },
+        resetRule() { drafts.rule = createBlankRule(); render(); },
+        saveRule() {
+          if (!drafts.rule.name.trim()) return flash("请先填写规则名称"), render();
+          const item = { ...clone(drafts.rule), id: drafts.rule.id || uid("rule") };
+          state.rules = state.rules.some((old) => old.id === item.id) ? state.rules.map((old) => old.id === item.id ? item : old) : [item, ...state.rules];
+          drafts.rule = createBlankRule();
+          commit("规则已保存");
+        },
+        editRule(id) { const item = state.rules.find((old) => old.id === id); if (item) { drafts.rule = clone(item); render(); } },
+        deleteRule(id) { state.rules = state.rules.filter((item) => item.id !== id); commit("规则已删除"); },
+        setRuleDate(value) { drafts.ruleDate = value; render(); },
+        logRule(id, status) {
+          const date = drafts.ruleDate;
+          state.ruleLogs[date] = { ...(state.ruleLogs[date] || {}) };
+          if (status) state.ruleLogs[date][id] = status;
+          else delete state.ruleLogs[date][id];
+          commit(status === "kept" ? "规则守住已记录" : status === "broken" ? "规则违反已记录" : "打卡已清除");
+        },
+        toggleWeeklyControlled(value) { drafts.weekly.controlledBy = toggleArrayItem(drafts.weekly.controlledBy || [], value); render(); },
+        resetWeekly() { drafts.weekly = createBlankWeeklyReview(todayKey()); render(); },
+        saveWeekly() {
+          const item = { ...clone(drafts.weekly), id: drafts.weekly.id || uid("week"), createdAt: drafts.weekly.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() };
+          state.weeklyReviews = state.weeklyReviews.some((old) => old.id === item.id) ? state.weeklyReviews.map((old) => old.id === item.id ? item : old) : [item, ...state.weeklyReviews];
+          drafts.weekly = createBlankWeeklyReview(todayKey());
+          commit("周复盘已保存");
+        },
+        editWeekly(id) { const item = state.weeklyReviews.find((old) => old.id === id); if (item) { drafts.weekly = clone(item); render(); } },
+        deleteWeekly(id) { state.weeklyReviews = state.weeklyReviews.filter((item) => item.id !== id); commit("周复盘已删除"); },
+        exportData() {
+          const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `xiuxin-backup-${todayKey()}.json`;
+          link.click();
+          URL.revokeObjectURL(url);
+        },
+        importData() {
+          const text = document.getElementById("import-json")?.value || "";
+          if (!text.trim()) return flash("请先粘贴备份 JSON"), render();
+          try {
+            state = migrateState(JSON.parse(text));
+            saveState();
+            showData = false;
+            flash("数据已导入");
+            render();
+          } catch (error) {
+            flash("JSON 格式不正确");
+            render();
+          }
+        },
+      };
+
+      render();
+    </script>
   </body>
 </html>
